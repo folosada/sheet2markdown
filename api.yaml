@@ -1,0 +1,49 @@
+openapi: 3.0.0
+info:
+  title: Sheet 2 Markdown API
+  contact:
+    name: Flávio Losada
+    url: https://github.com/folosada
+  version: 1.0.0
+
+x-amazon-apigateway-request-validators:
+  all:
+    validateRequestBody: true
+    validateRequestParameters: true
+  params:
+    validateRequestBody: false
+    validateRequestParameters: true
+  body:
+    validateRequestBody: true
+    validateRequestParameters: false
+
+paths:
+  /markdown:
+    post:
+      summary: Receive a base64 image and returns the markdown file
+      x-amazon-apigateway-request-validator: body
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: 
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Sheet2MarkdownFunction.Arn}/invocations
+        passthorughBehavior: when_no_match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: byte
+              example:
+                image: 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                
+      responses:
+        '200':
+          description: The markdown file extracted from image
+          content:
+            text/plain:
+              schema:
+                type: string

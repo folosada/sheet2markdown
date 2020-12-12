@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Sheet2Markdown SAM Stack
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+
+  Sheet2MarkdownApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      MethodSettings:
+        - HttpMethod: "POST"
+          ResourcePath: "/markdown"
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+          MetricsEnabled: true
+          ThrottlingRateLimit: 2000
+          ThrottlingBurstLimit: 1000
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './api.yaml'
+
+  Sheet2MarkdownFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      PackageType: Image      
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./
+      DockerTag: python3.8-v1
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  Sheet2MarkdownApi:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${Sheet2MarkdownApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  Sheet2MarkdownFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn
+  Sheet2MarkdownIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt HelloWorldFunctionRole.Arn
