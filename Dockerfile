@@ -13,15 +13,15 @@ RUN yum -y install wget
 
 # Just get a simple editor for convienience (you could just cancel this line)
 RUN yum -y install vim
+RUN yum -y groupinstall "Development Tools"
+RUN yum -y install tar && yum -y update tar
 
-RUN cd \
-    && wget https://cmake.org/files/v3.6/cmake-3.6.2.tar.gz \
-    && tar -zxvf cmake-3.6.2.tar.gz
-    && cd cmake-3.6.2
-    && ./bootstrap --prefix=/usr/local
-    && make
-    && make install
-    && cmake --version
+RUN wget https://cmake.org/files/v3.6/cmake-3.6.2.tar.gz \
+    && tar -zxvf cmake-3.6.2.tar.gz \
+    && cd cmake-3.6.2 \
+    && ./bootstrap \
+    && make \
+    && make install 
 
 # Second: get and build OpenCV 3.2
 #
@@ -44,10 +44,10 @@ RUN cd \
     && wget https://github.com/opencv/opencv_contrib/archive/4.5.0.zip \
     && unzip 4.5.0.zip \
     && cd opencv-4.5.0/build \
-    && cmake -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.5.0/modules/ .. \
+    && cmake .. \
     && make -j8 \
     && make install \
-    && cd ../.. \
+    && cd \
     && rm 4.5.0.zip
 
 COPY app.py requirements.txt ./
