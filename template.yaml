@@ -14,13 +14,9 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-      TracingEnabled: true
       MethodSettings:
         - HttpMethod: "POST"
           ResourcePath: "/markdown"
-          LoggingLevel: INFO
-          DataTraceEnabled: true
-          MetricsEnabled: true
           ThrottlingRateLimit: 2000
           ThrottlingBurstLimit: 1000
       DefinitionBody:
@@ -32,11 +28,22 @@ Resources:
   Sheet2MarkdownFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      PackageType: Image      
+      PackageType: Image
+      ImageUri: sheet2markdown:latest
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ./
-      DockerTag: python3.8-v1
+      DockerTag: latest
+      
+  Sheet2MarkdownFunctionPermission:
+    Type: "AWS::Lambda::Permission"
+    DependsOn:
+    - Sheet2MarkdownApi
+    - Sheet2MarkdownFunction
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref Sheet2MarkdownFunction
+      Principal: apigateway.amazonaws.com
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -46,8 +53,8 @@ Outputs:
     Description: "API Gateway endpoint URL for Prod stage"
     Value: !Sub "https://${Sheet2MarkdownApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
   Sheet2MarkdownFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
+    Description: "Sheet 2 Markdown Lambda Function ARN"
+    Value: !GetAtt Sheet2MarkdownFunction.Arn
   Sheet2MarkdownIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+    Description: "Implicit IAM Role created for Sheet 2 Markdown function"
+    Value: !GetAtt Sheet2MarkdownFunction.Arn

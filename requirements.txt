@@ -3,3 +3,4 @@ opencv-python==4.4.0.46
 boto3==1.16.0
 jsonschema==3.2.0
 numpy
+imageio==2.9.0

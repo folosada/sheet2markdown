@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Serverless Application Management Stack for Pipeline SmartBasket API.
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Resources:
+  ECRRepository:
+    DeletionPolicy: Retain
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: sheet2markdown
+  
+Outputs:
+  ECRRepositoryUri:
+    Export:
+      Name: !Sub ${AWS::StackName}:repository-uri
+    Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}
+  ECRRepositoryArn:
+    Export:
+      Name: !Sub ${AWS::StackName}:repository-arn
+    Value: !GetAtt ECRRepository.Arn
